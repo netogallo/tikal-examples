@@ -1,0 +1,3 @@
+[submodule "tikal"]
+	path = tikal
+	url = git@github.com:netogallo/tikal.git
