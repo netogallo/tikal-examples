@@ -4,16 +4,15 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     utils.url = "github:numtide/flake-utils";    
+    tikal-flake.url = "git+file:tikal";
   };
 
-  outputs = { self, nixpkgs, utils }:
+  outputs = { self, nixpkgs, utils, tikal-flake }:
     let
       inherit (utils.lib) eachDefaultSystem;
-      dummy-config = { pkgs, ...}: {
+      basic-config = { pkgs, ...}: {
         imports = [ "${nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix" ];
         boot.loader.grub.enable = false;
-        #services.getty.autoLogin.enable = true;
-		    #services.getty.autoLogin.user = "nixos";
 
 		    users.users.nixos = {
 			    isNormalUser = true;
@@ -28,26 +27,52 @@
 
       flake = system:
         let
+          tikal = tikal-flake.lib.${system};
           pkgs = import nixpkgs { inherit system; };
           nixos-system = nixpkgs.lib.nixosSystem {
             system = "x86_64-linux";
-            modules = [ dummy-config ];
+            modules = [ basic-config ];
           };
-          run' = pkgs.writeScript "nixos" ''
-            ${pkgs.qemu}/bin/qemu-x86_64 \
-              -m 1024
-              -enable-kvm \
-              -drive file=${nixos-system.config.system.build.images.qemu},model=virtio \
-              -cpu host
-          '';
+          example1 =
+            tikal.universe
+            ./example1/universe.nix
+            {
+              # base-dir is always a relative directory to the location
+              # where the flake is being run (ie. nix run .#sync). Therefore
+              # it must not be a path (ie. ./my-base-dir) as, in the case of flakes,
+              # that will point to a readonly directory in the store.
+              base-dir = "example1";
+
+              # The root directory of the flake. Sould always be ./.
+              flake-root = ./.;
+            };
+          example1-server =
+            nixpkgs.lib.nixosSystem {
+              inherit system;
+              modules = [
+                basic-config
+                example1.nixosModules.server
+              ];
+            }
+          ;
         in
           {
             apps = {
-              dummy = {
+              basic = {
                 type = "app";
                 program = "${nixos-system.config.system.build.vm}/bin/run-nixos-vm";
               };
+              example1 =
+                example1.apps //
+                {
+                  "server" = {
+                    type = "app";
+                    program = "${example1-server.config.system.build.vm}/bin/run-nixos-vm";
+                  };
+                }
+              ;
             };
+
             packages = {
               inherit nixos-system;
             };

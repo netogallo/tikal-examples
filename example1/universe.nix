@@ -1,0 +1,4 @@
+{
+  nahuales.server = {};
+  nahuales.client = {};
+}
