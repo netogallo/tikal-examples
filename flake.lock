@@ -75,10 +75,10 @@
         "utils": "utils"
       },
       "locked": {
-        "dirtyRev": "9759dcbf2b5241fb529520f147c89665be121d82-dirty",
-        "dirtyShortRev": "9759dcb-dirty",
-        "lastModified": 1746085485,
-        "narHash": "sha256-mt1TxDYIaP3wsWAG2TSP3nZssEWIzSOEn2HsZCl66SA=",
+        "dirtyRev": "3e93a328ba71f3336f6faf44323eb24b6d7462a2-dirty",
+        "dirtyShortRev": "3e93a32-dirty",
+        "lastModified": 1746374305,
+        "narHash": "sha256-qvJgJE7MBLv4+yvasYMTXbh4lnIIRwngAgUzvYMq1Ns=",
         "type": "git",
         "url": "file:tikal"
       },

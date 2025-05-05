@@ -57,6 +57,7 @@
           ;
         in
           {
+            inherit nixpkgs;
             apps = {
               basic = {
                 type = "app";
