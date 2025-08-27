@@ -24,7 +24,12 @@
           extraGroups = [ "wheel" ];
         };
 
-        environment.systemPackages = with pkgs; [ vim git curl ];
+        environment.systemPackages =
+          with pkgs;
+          [ vim git curl
+            netcat
+          ]
+        ;
 
 		    networking.useDHCP = true;
 		    system.stateVersion = "25.05";
@@ -32,7 +37,7 @@
 
       flake = system:
         let
-          tikal = tikal-flake.lib.${system};
+          tikal = (tikal-flake.override { log-level = 7; }).lib.${system};
           pkgs = import nixpkgs { inherit system; };
           nixos-system = nixpkgs.lib.nixosSystem {
             system = "x86_64-linux";
@@ -70,6 +75,21 @@
               modules = [
                 basic-config
                 example1.nixosModules.server
+                {
+                  config.system.name = "tikal-server";
+                }
+              ];
+            }
+          ;
+          example1-client =
+            nixpkgs.lib.nixosSystem {
+              inherit system;
+              modules = [
+                basic-config
+                example1.nixosModules.client
+                {
+                  config.system.name = "tikal-client";
+                }
               ];
             }
           ;
@@ -77,16 +97,16 @@
           {
             inherit nixpkgs;
             apps = {
-              basic = {
-                type = "app";
-                program = "${nixos-system.config.system.build.vm}/bin/run-nixos-vm";
-              };
               example1 =
                 example1.apps //
                 {
                   "server" = {
                     type = "app";
-                    program = "${example1-server.config.system.build.vm}/bin/run-nixos-vm";
+                    program = "${example1-server.config.system.build.vm}/bin/run-tikal-server-vm";
+                  };
+                  "client" = {
+                    type = "app";
+                    program = "${example1-client.config.system.build.vm}/bin/run-tikal-client-vm";
                   };
                 }
               ;
@@ -96,6 +116,7 @@
               inherit nixos-system;
               example1 = {
                 server = example1-server;
+                client = example1-client;
               };
             };
           }
