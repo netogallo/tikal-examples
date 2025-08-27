@@ -13,7 +13,8 @@
     let
       inherit (utils.lib) eachDefaultSystem;
       basic-config = { pkgs, ...}: {
-        imports = [ "${nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix" ];
+        #imports = [ "${nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix" ];
+        imports = [ "${tikal-flake}/modules/virtualization/tikal-qemu.nix" ];
         boot.loader.grub.enable = false;
 
         security.sudo.enable = true;
@@ -102,7 +103,8 @@
                 {
                   "server" = {
                     type = "app";
-                    program = "${example1-server.config.system.build.vm}/bin/run-tikal-server-vm";
+                    #program = "${example1-server.config.system.build.vm}/bin/run-tikal-server-vm";
+                    program = "${example1-server.config.system.build.tikal.vm.qemu}";
                   };
                   "client" = {
                     type = "app";
