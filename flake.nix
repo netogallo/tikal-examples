@@ -104,7 +104,7 @@
                   "server" = {
                     type = "app";
                     #program = "${example1-server.config.system.build.vm}/bin/run-tikal-server-vm";
-                    program = "${example1-server.config.system.build.tikal.vm.qemu}";
+                    program = "${example1-server.config.system.build.tikal.vm.qemu}/bin/run-qemu";
                   };
                   "client" = {
                     type = "app";
@@ -116,6 +116,7 @@
 
             packages = {
               inherit nixos-system;
+              inherit (tikal) tikal;
               example1 = {
                 server = example1-server;
                 client = example1-client;
